@@ -1,0 +1,10 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "start": "node example.js"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.2",
+    "react": "^16.4.1"
+  }
+}

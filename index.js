@@ -28,12 +28,16 @@ function fakeProp(type, propToString, isRequired){
 }
 
 function oneOfToString(props) {
-  return `${props.map(s=>typeof s === 'string' ? `'${s}'`: String(s)).join(' | ')}`;
+  return props
+    .map(prop=>JSON.stringify(prop))
+    .filter(str=>typeof str === 'string')
+    .map(str=>str.replace(/"/g, `'`))
+    .join(' | ');
 }  
 
 function oneOfTypeToString(props, path, options) {
-  return `${props.map(prop=>prop.toString(path, options)).join(' | ')}`;
-}  
+  return props.map(prop=>prop.toString(path, options)).join(' | ');
+}
 
 function shapeToString(shape, path, options) {
   return `{\n`+padStr(
@@ -62,7 +66,7 @@ const fakePropTypes = {
   string: fakeProp('string'),
   symbol: fakeProp('Symbol'),
 
-  //values that could be maped
+  //values that could be mapped
   element: fakeProp('ReactChild', genericCallback('mapReactChild')),
   node: fakeProp('ReactNode', genericCallback('mapReactNode')),
   array: fakeProp('Array<any>', genericCallback('mapArray')),
@@ -125,7 +129,7 @@ function getComponentProps(comp, path, options) {
       const prop = isCustomValidator(comp.propTypes[key]) ? 'any' : comp.propTypes[key];
       const defaultProp = comp.defaultProps && comp.defaultProps[key];
       const required = prop._req && (defaultProp === undefined);
-      const propValue = prop.toString(`${path}.${key}`, options), defaultProp, key;
+      const propValue = prop.toString(`${path}.${key}`, options);
       const defaultValue = defaultProp == null ? '' : ` //default: ${JSON.stringify(defaultProp)}`;
       const propKey = key + (required ? '' : '?');
       return `${propKey}: ${propValue};${defaultValue}`
@@ -153,21 +157,27 @@ function generateTypes(moduleName, moduleExport, options = {}) {
   if (Array.isArray(customDeclarations)) {
     customDeclarations = customDeclarations.join('\n');
   }
-  return  `declare module '${moduleName}' {\n\n`+
-    padStr(
-      `import { Component, CSSProperties, PureComponent, ReactChild, ReactNode, SFC } from 'react';\n\n`+
-      customDeclarations+'\n\n'+
-      Object
-        .keys(moduleExport)
+
+  const moduleContent = moduleExport.propTypes
+    //single component
+    ? getComponent(moduleExport.name, moduleExport, options)
+    //set of components
+    : Object.keys(moduleExport)
         .filter(key=>moduleExport[key].propTypes)
         .map(key=>getComponent(key, moduleExport[key], options))
         .join('\n')+
-      '\n\n'+
+        '\n\n'+
       Object
         .keys(moduleExport)
         .filter(key=>!moduleExport[key].propTypes)
         .map(key=>`export const ${getSimpleProperty(key, moduleExport[key])};`)
-        .join('\n\n')+'\n'
+        .join('\n\n');
+
+  return  `declare module '${moduleName}' {\n\n`+
+    padStr(
+      `import { Component, CSSProperties, PureComponent, ReactChild, ReactNode, SFC } from 'react';\n\n`+
+      customDeclarations+'\n'+
+      moduleContent+'\n'
     )+
   `}\n`;
 }
