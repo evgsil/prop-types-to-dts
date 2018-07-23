@@ -141,14 +141,18 @@ function getComponentProps(comp, path, options) {
 
 function getComponent(name, comp, options) {
   const parentName = comp.__proto__.name;
-  const props = getComponentProps(comp, name, options);
+  const props = padStr(getComponentProps(comp, name, options));
 
   if (parentName) {
-    return `export interface ${name}Props {${padStr(props)}}\n`+
-           `export class ${name}<T = any> extends ${parentName}<${name}Props & T> {}\n`;
+    return options.getComponent
+      ? options.getComponent(name, props, parentName)
+      : `export interface ${name}Props {${props}}\n`+
+        `export class ${name}<T = any> extends ${parentName}<${name}Props & T> {}\n`;
   } else {
-    return `export interface ${name}Props {${padStr(props)}}\n`+
-           `export const ${name}: SFC<${name}Props>;\n`;
+    return options.getSFCComponent
+      ? options.getSFCComponent(name, props)
+      : `export interface ${name}Props {${props}}\n`+
+        `export const ${name}: SFC<${name}Props>;\n`;
   }
 };
 
