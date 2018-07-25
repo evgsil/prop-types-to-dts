@@ -127,10 +127,10 @@ function getComponentProps(comp, path, options) {
     .filter(key=>!parentKeys.some(parentKey=>key===parentKey))
     .map((key)=>{
       const prop = isCustomValidator(comp.propTypes[key]) ? 'any' : comp.propTypes[key];
-      const defaultProp = comp.defaultProps && comp.defaultProps[key];
+      const defaultProp = comp.defaultProps && JSON.stringify(comp.defaultProps[key]);
       const required = prop._req && (defaultProp === undefined);
       const propValue = prop.toString(`${path}.${key}`, options);
-      const defaultValue = defaultProp == null ? '' : ` //default: ${JSON.stringify(defaultProp)}`;
+      const defaultValue = defaultProp == null ? '' : ` //default: ${defaultProp.replace(/"/g, `'`)}`;
       const propKey = key + (required ? '' : '?');
       return `${propKey}: ${propValue};${defaultValue}`
     })
@@ -142,18 +142,22 @@ function getComponentProps(comp, path, options) {
 function getComponent(name, comp, options) {
   const parentName = comp.__proto__.name;
   const props = padStr(getComponentProps(comp, name, options));
-
+  let result;
   if (parentName) {
-    return options.getComponent
-      ? options.getComponent(name, props, parentName)
-      : `export interface ${name}Props {${props}}\n`+
-        `export class ${name}<T = any> extends ${parentName}<${name}Props & T> {}\n`;
+    result = 
+      `export interface ${name}Props {${props}}\n`+
+      `export class ${name}<T = any> extends ${parentName}<${name}Props & T> {}\n`;
   } else {
-    return options.getSFCComponent
-      ? options.getSFCComponent(name, props)
-      : `export interface ${name}Props {${props}}\n`+
-        `export const ${name}: SFC<${name}Props>;\n`;
+    result = 
+      `export interface ${name}Props {${props}}\n`+
+      `export const ${name}: SFC<${name}Props>;\n`;
   }
+
+  if (options.getComponent) {
+    result = options.getComponent(name, props, parentName, result);
+  }
+
+  return result;
 };
 
 function generateTypes(moduleName, moduleExport, options = {}) {
