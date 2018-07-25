@@ -20,6 +20,9 @@ console.log(generateTypes('my-library', require('./my-library'),{
   //Replace all style objects with CSSProperties
   mapObject: (path, defValue) => /style/i.test(path) ? 'CSSProperties' : defValue, 
 
+  //Callback for getting whole component type
+  getComponent: (name, props, parentName, defValue) => defValue,
+
   customDeclarations: [
     'export interface Message {',
     '  show: (str: string) => void;',
