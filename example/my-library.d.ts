@@ -1,10 +1,11 @@
 declare module 'my-library' {
 
-  import { Component, CSSProperties, PureComponent, ReactChild, ReactNode, SFC } from 'react';
+  import { Component, PureComponent, ReactChild, ReactNode, SFC, CSSProperties } from 'react'
 
   export interface Message {
     show: (str: string) => void;
   }
+
   export interface MyComponentProps {
     optionalArray?: Array<any>;
     optionalBool?: boolean;
@@ -30,6 +31,39 @@ declare module 'my-library' {
     customArrayProp?: Array<any>;
   }
   export class MyComponent<T = any> extends Component<MyComponentProps & T> {}
+
+  export interface TestComponentProps {
+    shape: {
+      innerShape?: {
+        validateString: (value: string) => boolean;
+        style?: {
+          header?: CSSProperties;
+          body?: CSSProperties;
+          footer?: CSSProperties;
+        };
+        x: number;
+        date?: Date;
+        oneMoreShape?: {
+          arrayOf?: Array<{
+            str: string;
+            bool: boolean;
+          } | number | Date | {
+            str?: string;
+            bool?: boolean;
+          }>;
+          oneOfType?: string | number | Date;
+        };
+      };
+      exact: {
+        str?: string;
+      };
+      oneOf?: 1 | 'a' | true | false | 2.5 | {'obj':'test'} | [1,'2',3];
+      oneOfType?: {
+        x?: number;
+      } | boolean;
+    };
+  }
+  export class TestComponent<T = any> extends PureComponent<TestComponentProps & T> {}
 
 
 

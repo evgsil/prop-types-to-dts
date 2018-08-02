@@ -161,6 +161,9 @@ function getComponent(name, comp, options) {
 };
 
 function generateTypes(moduleName, moduleExport, options = {}) {
+  const reactImport = options.skipReactImport ? '' : 
+    `import { Component, PureComponent, ReactChild, ReactNode, SFC } from 'react';\n\n`;
+
   let customDeclarations = options.customDeclarations || '';
   if (Array.isArray(customDeclarations)) {
     customDeclarations = customDeclarations.join('\n');
@@ -183,7 +186,7 @@ function generateTypes(moduleName, moduleExport, options = {}) {
 
   return  `declare module '${moduleName}' {\n\n`+
     padStr(
-      `import { Component, CSSProperties, PureComponent, ReactChild, ReactNode, SFC } from 'react';\n\n`+
+      reactImport+
       customDeclarations+'\n'+
       moduleContent+'\n'
     )+
