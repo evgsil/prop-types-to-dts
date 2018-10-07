@@ -65,6 +65,4 @@ declare module 'my-library' {
   }
   export class TestComponent<T = any> extends PureComponent<TestComponentProps & T> {}
 
-
-
 }

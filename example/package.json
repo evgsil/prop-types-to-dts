@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "prop-types": "^15.6.2",
-    "react": "^16.4.1",
-    "prop-types-to-dts": "file:.."
+    "prop-types-to-dts": "file:..",
+    "react": "^16.5.2"
   }
 }
