@@ -111,7 +111,7 @@ function getComponent(name, comp, options) {
   if (parentName) {
     result = 
       `export interface ${name}Props {${props}}\n`+
-      `export class ${name}<T = any> extends ${parentName}<${name}Props & T> {}\n`;
+      `export class ${name} extends ${parentName}<${name}Props> {}\n`;
   } else {
     result = 
       `export interface ${name}Props {${props}}\n`+

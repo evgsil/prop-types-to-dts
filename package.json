@@ -1,6 +1,6 @@
 {
   "name": "prop-types-to-dts",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Generates TypeScript definition file from PropTypes",
   "main": "index.js",
   "scripts": {
